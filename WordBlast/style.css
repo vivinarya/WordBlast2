@@ -9,6 +9,21 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    flex-direction: column; /*added to get title at the top*/
+}
+
+/*Added stylized title*/
+#game-title {
+    margin: 20px 0;
+    font-size: 48px;
+    letter-spacing: 4px;
+    color: #0f0;
+    text-align: center;
+    font-family: 'Times New Roman', 'Times New Roman', Times, serif, monospace;
+    font-style: italic;
+    text-shadow:
+        0 0 5px #0f0,
+        0 0 15px rgba(0, 255, 0, 0.7);
 }
 
 #game-container {
