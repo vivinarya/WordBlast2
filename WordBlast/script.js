@@ -23,6 +23,59 @@ const wordList = [
 
 
 let enemies = [];
+let particles = [];
+
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        
+        // Random velocity in all directions
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 4;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        
+        // Friction slows down particles
+        this.friction = 0.95;
+        
+        // Alpha fading
+        this.alpha = 1;
+        this.alphaDecay = 0.02 + Math.random() * 0.03;
+        
+        // Random size and color
+        this.size = 2 + Math.random() * 3;
+        this.colors = ['#0f0', '#00ff00', '#00dd00', '#00cc00'];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+    }
+
+    update() {
+        // Apply velocity
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Apply friction
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        
+        // Fade out
+        this.alpha -= this.alphaDecay;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    isDead() {
+        return this.alpha <= 0;
+    }
+}
 
 class Enemy {
     constructor(x, y, text) {
@@ -68,6 +121,12 @@ window.addEventListener('keydown', (e) => {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
+                // Spawn 20 particles at enemy position
+                const enemy = enemies[i];
+                for (let j = 0; j < 20; j++) {
+                    particles.push(new Particle(enemy.x, enemy.y));
+                }
+                
                 enemies.splice(i, 1);
                 score += 10;
                 scoreElement.innerText = score;
@@ -98,6 +157,16 @@ function gameLoop(timestamp) {
 
         if (enemy.y > canvas.height) {
             gameOver();
+        }
+    }
+
+    // Update and draw particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        
+        if (particles[i].isDead()) {
+            particles.splice(i, 1);
         }
     }
 
