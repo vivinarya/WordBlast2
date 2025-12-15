@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const livesElement = document.getElementById("lives"); //adding constant for lives
 
 
 canvas.width = 800;
@@ -13,6 +14,7 @@ let score = 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
+let lives = 3; //variable for 3 lives
 
 
 const wordList = [
@@ -96,13 +98,24 @@ function gameLoop(timestamp) {
         enemy.update();
         enemy.draw();
 
-        if (enemy.y > canvas.height) {
+       if (enemy.y > canvas.height) {
+            enemies.splice(i, 1);  //update lives when word not typed
+            lives--;
+            updateLivesUI();
+
+        if (lives <= 0) {
             gameOver();
-        }
+            return;
+    }
+}
+
     }
 
     requestAnimationFrame(gameLoop);
 }
 
+function updateLivesUI() { //helper function to update hearts
+    livesElement.innerText = "❤️".repeat(lives);
+}
 
 requestAnimationFrame(gameLoop);
