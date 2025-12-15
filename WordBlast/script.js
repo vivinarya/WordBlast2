@@ -1,76 +1,17 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const scoreElement = document.getElementById("score");
-const finalScoreElement = document.getElementById("final-score");
-const gameOverScreen = document.getElementById("game-over");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreElement = document.getElementById('score');
+const finalScoreElement = document.getElementById('final-score');
+const gameOverScreen = document.getElementById('game-over');
 
 canvas.width = 800;
 canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
-let startTime = null;
-let wordsDestroyed = 0;
 let spawnRate = 2000;
 let lastSpawnTime = 0;
 
-// --------------------
-// Settings (localStorage)
-// --------------------
-const settingsBtn = document.getElementById("settings-btn");
-const settingsModal = document.getElementById("settings-modal");
-const closeSettings = document.getElementById("close-settings");
-const soundToggle = document.getElementById("sound-toggle");
-const themeSelect = document.getElementById("theme-select");
-const difficultySelect = document.getElementById("difficulty-select");
-
-const settings = JSON.parse(localStorage.getItem("wordblast-settings")) || {
-    sound: true,
-    theme: "dark",
-    difficulty: "medium"
-};
-
-soundToggle.checked = settings.sound;
-themeSelect.value = settings.theme;
-difficultySelect.value = settings.difficulty;
-
-function applySettings() {
-    document.body.classList.toggle("light", settings.theme === "light");
-
-    if (settings.difficulty === "easy") spawnRate = 2500;
-    if (settings.difficulty === "medium") spawnRate = 2000;
-    if (settings.difficulty === "hard") spawnRate = 1200;
-}
-
-function saveSettings() {
-    localStorage.setItem("wordblast-settings", JSON.stringify(settings));
-}
-
-applySettings();
-
-settingsBtn.onclick = () => settingsModal.classList.remove("hidden");
-closeSettings.onclick = () => settingsModal.classList.add("hidden");
-
-soundToggle.onchange = () => {
-    settings.sound = soundToggle.checked;
-    saveSettings();
-};
-
-themeSelect.onchange = () => {
-    settings.theme = themeSelect.value;
-    applySettings();
-    saveSettings();
-};
-
-difficultySelect.onchange = () => {
-    settings.difficulty = difficultySelect.value;
-    applySettings();
-    saveSettings();
-};
-
-// --------------------
-// Game Logic
-// --------------------
 const wordList = [
     "code", "bug", "fix", "git", "push", "pull", "merge",
     "java", "node", "html", "css", "react", "vue", "data",
@@ -78,18 +19,23 @@ const wordList = [
 ];
 
 let enemies = [];
+let particles = [];
 
+/* --------------------
+   Enemy Class
+-------------------- */
 class Enemy {
     constructor(x, y, text) {
         this.x = x;
         this.y = y;
         this.text = text;
         this.speed = 1 + Math.random();
+        this.color = '#0f0';
     }
 
     draw() {
-        ctx.font = "20px Courier New";
-        ctx.fillStyle = "#0f0";
+        ctx.font = '20px Courier New';
+        ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.x, this.y);
     }
 
@@ -98,30 +44,65 @@ class Enemy {
     }
 }
 
+/* --------------------
+   Particle Class
+-------------------- */
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 2;
+        this.alpha = 1;
+        this.velocityX = (Math.random() - 0.5) * 6;
+        this.velocityY = (Math.random() - 0.5) * 6;
+        this.friction = 0.95;
+    }
+
+    update() {
+        this.velocityX *= this.friction;
+        this.velocityY *= this.friction;
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        this.alpha -= 0.02;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = '#0f0';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+/* --------------------
+   Helpers
+-------------------- */
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
-    enemies.push(new Enemy(x, -20, text));
+    const y = -20;
+    enemies.push(new Enemy(x, y, text));
+}
+
+function spawnParticles(x, y) {
+    for (let i = 0; i < 20; i++) {
+        particles.push(new Particle(x, y));
+    }
 }
 
 function gameOver() {
     isGameOver = true;
-
-    const elapsedMinutes = (performance.now() - startTime) / 60000;
-    const wpm = elapsedMinutes > 0
-        ? Math.round(wordsDestroyed / elapsedMinutes)
-        : 0;
-
     finalScoreElement.innerText = score;
-
-    const wpmElement = document.createElement("p");
-    wpmElement.innerText = `Typing Speed: ${wpm} WPM`;
-    gameOverScreen.appendChild(wpmElement);
-
-    gameOverScreen.classList.remove("hidden");
+    gameOverScreen.classList.remove('hidden');
 }
 
-window.addEventListener("keydown", (e) => {
+/* --------------------
+   Input
+-------------------- */
+window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
 
     const key = e.key.toLowerCase();
@@ -131,9 +112,9 @@ window.addEventListener("keydown", (e) => {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
+                spawnParticles(enemies[i].x, enemies[i].y);
                 enemies.splice(i, 1);
                 score += 10;
-                wordsDestroyed++;
                 scoreElement.innerText = score;
             }
             break;
@@ -141,23 +122,37 @@ window.addEventListener("keydown", (e) => {
     }
 });
 
+/* --------------------
+   Game Loop
+-------------------- */
 function gameLoop(timestamp) {
     if (isGameOver) return;
-    if (!startTime) startTime = timestamp;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
         lastSpawnTime = timestamp;
+        if (spawnRate > 500) spawnRate -= 10;
     }
 
-    for (let enemy of enemies) {
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
         enemy.update();
         enemy.draw();
 
         if (enemy.y > canvas.height) {
             gameOver();
+        }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw();
+
+        if (p.alpha <= 0) {
+            particles.splice(i, 1);
         }
     }
 
