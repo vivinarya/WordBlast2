@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
+const highScoreElement = document.getElementById('high-score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
 
@@ -10,6 +11,7 @@ canvas.height = 600;
 
 
 let score = 0;
+let highScore = parseInt(localStorage.getItem('wordBlastHighScore')) || 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
@@ -54,6 +56,13 @@ function spawnEnemy() {
 function gameOver() {
     isGameOver = true;
     finalScoreElement.innerText = score;
+    
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('wordBlastHighScore', highScore);
+        highScoreElement.innerText = highScore;
+    }
+    
     gameOverScreen.classList.remove('hidden');
 }
 
@@ -104,5 +113,5 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
-
+highScoreElement.innerText = highScore;
 requestAnimationFrame(gameLoop);
