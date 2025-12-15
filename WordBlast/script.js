@@ -3,7 +3,6 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
-const mobileInput = document.getElementById('mobileInput');
 
 canvas.width = 800;
 canvas.height = 600;
@@ -20,10 +19,9 @@ const wordList = [
 ];
 
 let enemies = [];
+let particles = [];
 
-/* --------------------
-   Enemy Class
--------------------- */
+/* ---------------- Enemy ---------------- */
 class Enemy {
     constructor(x, y, text) {
         this.x = x;
@@ -44,14 +42,50 @@ class Enemy {
     }
 }
 
-/* --------------------
-   Helpers
--------------------- */
+/* ---------------- Particle ---------------- */
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 6;
+        this.vy = (Math.random() - 0.5) * 6;
+        this.radius = Math.random() * 2 + 1;
+        this.alpha = 1;
+        this.friction = 0.98;
+        this.gravity = 0.05;
+    }
+
+    update() {
+        this.vx *= this.friction;
+        this.vy = this.vy * this.friction + this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= 0.03;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = '#0f0';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+/* ---------------- Helpers ---------------- */
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
     const y = -20;
     enemies.push(new Enemy(x, y, text));
+}
+
+function spawnParticles(x, y) {
+    for (let i = 0; i < 20; i++) {
+        particles.push(new Particle(x, y));
+    }
 }
 
 function gameOver() {
@@ -60,19 +94,18 @@ function gameOver() {
     gameOverScreen.classList.remove('hidden');
 }
 
-/* --------------------
-   Unified Input Handler
--------------------- */
-function handleInput(key) {
+/* ---------------- Input ---------------- */
+window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
 
-    key = key.toLowerCase();
+    const key = e.key.toLowerCase();
 
     for (let i = 0; i < enemies.length; i++) {
         if (enemies[i].text[0]?.toLowerCase() === key) {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
+                spawnParticles(enemies[i].x, enemies[i].y);
                 enemies.splice(i, 1);
                 score += 10;
                 scoreElement.innerText = score;
@@ -80,33 +113,9 @@ function handleInput(key) {
             break;
         }
     }
-}
-
-/* --------------------
-   Desktop Keyboard
--------------------- */
-window.addEventListener('keydown', (e) => {
-    handleInput(e.key);
 });
 
-/* --------------------
-   Mobile Keyboard Support
--------------------- */
-canvas.addEventListener('touchstart', () => {
-    mobileInput.focus();
-});
-
-mobileInput.addEventListener('input', () => {
-    const value = mobileInput.value;
-    if (value.length > 0) {
-        handleInput(value[value.length - 1]);
-        mobileInput.value = "";
-    }
-});
-
-/* --------------------
-   Game Loop
--------------------- */
+/* ---------------- Game Loop ---------------- */
 function gameLoop(timestamp) {
     if (isGameOver) return;
 
@@ -125,6 +134,16 @@ function gameLoop(timestamp) {
 
         if (enemy.y > canvas.height) {
             gameOver();
+        }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw();
+
+        if (p.alpha <= 0) {
+            particles.splice(i, 1);
         }
     }
 
