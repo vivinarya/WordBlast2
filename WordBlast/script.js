@@ -53,9 +53,20 @@ function spawnEnemy() {
 
 function gameOver() {
     isGameOver = true;
-    finalScoreElement.innerText = score;
+
+    const elapsedTimeMs = performance.now() - gameStartTime;
+    const elapsedMinutes = elapsedTimeMs / 60000;
+
+    finalWPM = elapsedMinutes > 0
+        ? Math.round(wordsDestroyed / elapsedMinutes)
+        : 0;
+
+    finalScoreElement.innerText =
+        score + " | WPM: " + finalWPM;
+
     gameOverScreen.classList.remove('hidden');
 }
+
 
 
 window.addEventListener('keydown', (e) => {
