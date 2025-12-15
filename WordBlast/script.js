@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const startMenu = document.getElementById('start-menu');
+const playButton = document.getElementById('play-button');
 
 
 canvas.width = 800;
@@ -11,6 +13,7 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+let gameStarted = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -59,7 +62,7 @@ function gameOver() {
 
 
 window.addEventListener('keydown', (e) => {
-    if (isGameOver) return;
+    if (!gameStarted || isGameOver) return;
 
     const key = e.key.toLowerCase();
 
@@ -78,7 +81,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 function gameLoop(timestamp) {
-    if (isGameOver) return;
+    if (!gameStarted || isGameOver) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -104,5 +107,12 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
-
-requestAnimationFrame(gameLoop);
+// Play button handler
+if (playButton) {
+    playButton.addEventListener('click', () => {
+        gameStarted = true;
+        if (startMenu) startMenu.classList.add('hidden');
+        lastSpawnTime = performance.now();
+        requestAnimationFrame(gameLoop);
+    });
+}
