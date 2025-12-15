@@ -3,17 +3,18 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const livesElement = document.getElementById('lives');
 
 canvas.width = 800;
 canvas.height = 600;
 
 let score = 0;
 let level = 1;
+let lives = 3;
 let isGameOver = false;
 let isPaused = false;
 let spawnRate = 2000;
 let lastSpawnTime = 0;
-
 let levelUpAlpha = 0;
 let lockedEnemy = null;
 
@@ -50,6 +51,17 @@ function spawnEnemy() {
     const x = Math.random() * (canvas.width - 100) + 50;
     const speed = 1 + level * 0.8;
     enemies.push(new Enemy(x, -20, text, speed));
+}
+
+function updateLivesUI() {
+    livesElement.innerText = '❤️ '.repeat(lives).trim();
+}
+
+function loseLife() {
+    lives--;
+    updateLivesUI();
+    lockedEnemy = null;
+    if (lives <= 0) gameOver();
 }
 
 function gameOver() {
@@ -143,8 +155,8 @@ function gameLoop(timestamp) {
         enemy.draw();
 
         if (enemy.y > canvas.height) {
-            if (enemy === lockedEnemy) lockedEnemy = null;
-            gameOver();
+            enemies.splice(i, 1);
+            loseLife();
         }
     }
 
@@ -152,4 +164,5 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
+updateLivesUI();
 requestAnimationFrame(gameLoop);
