@@ -13,6 +13,7 @@ let score = 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
+let pause=false;
 
 
 const wordList = [
@@ -72,10 +73,14 @@ function gameOver() {
 
 
 window.addEventListener('keydown', (e) => {
-    if (isGameOver) return;
+
+    if (e.key==='Escape'&&!isGameOver) {
+    pause=!pause;
+    return;
+}
+    if (isGameOver || pause) return;
 
     const key = e.key.toLowerCase();
-
     for (let i = 0; i < enemies.length; i++) {
         if (enemies[i].text[0] && enemies[i].text[0].toLowerCase() === key) {
             enemies[i].text = enemies[i].text.slice(1);
@@ -90,11 +95,27 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
+function drawPausedText() {
+    ctx.fillStyle='rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font='48px Courier New';
+    ctx.fillStyle='#ffffff';
+    ctx.textAlign='center';
+    ctx.fillText('PAUSED',canvas.width/2,canvas.height/2)
+    ctx.textAlign='left';
+}
+
 function gameLoop(timestamp) {
     if (isGameOver) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (pause) {
+        drawPausedText();
+        requestAnimationFrame(gameLoop);
+        return;   
+    }
 
     if (timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
