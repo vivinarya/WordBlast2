@@ -13,6 +13,15 @@ let score = 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
+let isBossActive = false;
+let nextBossScore = 1000;
+
+const bossWordList = [
+    "Supercalifragilisticexpialidocious",
+    "Pseudopseudohypoparathyroidism",
+    "Floccinaucinihilipilification",
+    "Antidisestablishmentarianism"
+];
 
 
 const wordList = [
@@ -25,18 +34,31 @@ const wordList = [
 let enemies = [];
 
 class Enemy {
-    constructor(x, y, text) {
+    constructor(x, y, text, isBoss = false) {
         this.x = x;
         this.y = y;
         this.text = text;
-        this.speed = 1 + Math.random(); 
-        this.color = '#0f0';
+        this.isBoss = isBoss;
+        this.speed = isBoss ? 0.5 : 1 + Math.random(); 
+        this.color = isBoss ? '#ff0000' : '#0f0';
+        this.originalText = text;
     }
 
     draw() {
-        ctx.font = '20px Courier New';
+        ctx.font = this.isBoss ? 'bold 24px Courier New' : '20px Courier New';
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.x, this.y);
+
+        if (this.isBoss) {
+            const healthPercentage = this.text.length / this.originalText.length;
+            const barWidth = 200;
+            const barHeight = 10;
+            
+            ctx.fillStyle = 'gray';
+            ctx.fillRect(this.x, this.y - 30, barWidth, barHeight);
+            ctx.fillStyle = 'red';
+            ctx.fillRect(this.x, this.y - 30, barWidth * healthPercentage, barHeight);
+        }
     }
 
     update() {
@@ -49,6 +71,13 @@ function spawnEnemy() {
     const x = Math.random() * (canvas.width - 100) + 50;
     const y = -20; 
     enemies.push(new Enemy(x, y, text));
+}
+
+function spawnBoss() {
+    const text = bossWordList[Math.floor(Math.random() * bossWordList.length)];
+    const x = 50; 
+    const y = -50; 
+    enemies.push(new Enemy(x, y, text, true));
 }
 
 function gameOver() {
@@ -68,8 +97,13 @@ window.addEventListener('keydown', (e) => {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
+                if (enemies[i].isBoss) {
+                    isBossActive = false;
+                    score += 100;
+                } else {
+                    score += 10;
+                }
                 enemies.splice(i, 1);
-                score += 10;
                 scoreElement.innerText = score;
             }
             break;
@@ -83,7 +117,11 @@ function gameLoop(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
-    if (timestamp - lastSpawnTime > spawnRate) {
+    if (!isBossActive && score >= nextBossScore) {
+        spawnBoss();
+        isBossActive = true;
+        nextBossScore += 1000;
+    } else if (!isBossActive && timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
         lastSpawnTime = timestamp;
 
