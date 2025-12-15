@@ -15,6 +15,7 @@ let spawnRate = 2000;
 let lastSpawnTime = 0;
 
 let levelUpAlpha = 0;
+let lockedEnemy = null;
 
 const wordList = [
     "code", "bug", "fix", "git", "push", "pull", "merge",
@@ -47,8 +48,8 @@ class Enemy {
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
-    const baseSpeed = 1 + level * 0.8;
-    enemies.push(new Enemy(x, -20, text, baseSpeed));
+    const speed = 1 + level * 0.8;
+    enemies.push(new Enemy(x, -20, text, speed));
 }
 
 function gameOver() {
@@ -76,16 +77,26 @@ window.addEventListener('keydown', (e) => {
 
     if (isGameOver || isPaused) return;
 
-    for (let i = 0; i < enemies.length; i++) {
-        if (enemies[i].text[0]?.toLowerCase() === key) {
-            enemies[i].text = enemies[i].text.slice(1);
+    if (lockedEnemy) {
+        if (lockedEnemy.text[0]?.toLowerCase() === key) {
+            lockedEnemy.text = lockedEnemy.text.slice(1);
 
-            if (enemies[i].text === "") {
-                enemies.splice(i, 1);
+            if (lockedEnemy.text === "") {
+                enemies.splice(enemies.indexOf(lockedEnemy), 1);
+                lockedEnemy = null;
                 score += 10;
                 scoreElement.innerText = score;
                 checkLevelUp();
             }
+        }
+        return;
+    }
+
+    for (let enemy of enemies) {
+        if (enemy.text[0]?.toLowerCase() === key) {
+            lockedEnemy = enemy;
+            enemy.color = '#fff';
+            enemy.text = enemy.text.slice(1);
             break;
         }
     }
@@ -130,7 +141,11 @@ function gameLoop(timestamp) {
         const enemy = enemies[i];
         enemy.update();
         enemy.draw();
-        if (enemy.y > canvas.height) gameOver();
+
+        if (enemy.y > canvas.height) {
+            if (enemy === lockedEnemy) lockedEnemy = null;
+            gameOver();
+        }
     }
 
     drawLevelUp();
