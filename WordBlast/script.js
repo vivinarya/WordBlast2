@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const typingSound = document.getElementById('typing-sound');
+const dieSound = document.getElementById('die-sound');
 
 
 canvas.width = 800;
@@ -13,15 +15,6 @@ let score = 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
-let isBossActive = false;
-let nextBossScore = 1000;
-
-const bossWordList = [
-    "Supercalifragilisticexpialidocious",
-    "Pseudopseudohypoparathyroidism",
-    "Floccinaucinihilipilification",
-    "Antidisestablishmentarianism"
-];
 
 
 const wordList = [
@@ -34,31 +27,18 @@ const wordList = [
 let enemies = [];
 
 class Enemy {
-    constructor(x, y, text, isBoss = false) {
+    constructor(x, y, text) {
         this.x = x;
         this.y = y;
         this.text = text;
-        this.isBoss = isBoss;
-        this.speed = isBoss ? 0.5 : 1 + Math.random(); 
-        this.color = isBoss ? '#ff0000' : '#0f0';
-        this.originalText = text;
+        this.speed = 1 + Math.random(); 
+        this.color = '#0f0';
     }
 
     draw() {
-        ctx.font = this.isBoss ? 'bold 24px Courier New' : '20px Courier New';
+        ctx.font = '20px Courier New';
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.x, this.y);
-
-        if (this.isBoss) {
-            const healthPercentage = this.text.length / this.originalText.length;
-            const barWidth = 200;
-            const barHeight = 10;
-            
-            ctx.fillStyle = 'gray';
-            ctx.fillRect(this.x, this.y - 30, barWidth, barHeight);
-            ctx.fillStyle = 'red';
-            ctx.fillRect(this.x, this.y - 30, barWidth * healthPercentage, barHeight);
-        }
     }
 
     update() {
@@ -73,22 +53,19 @@ function spawnEnemy() {
     enemies.push(new Enemy(x, y, text));
 }
 
-function spawnBoss() {
-    const text = bossWordList[Math.floor(Math.random() * bossWordList.length)];
-    const x = 50; 
-    const y = -50; 
-    enemies.push(new Enemy(x, y, text, true));
-}
-
 function gameOver() {
     isGameOver = true;
     finalScoreElement.innerText = score;
     gameOverScreen.classList.remove('hidden');
+    gameOverSound.play();
 }
 
 
 window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
+
+    typingSound.currentTime = 0;
+    typingSound.play();
 
     const key = e.key.toLowerCase();
 
@@ -96,15 +73,15 @@ window.addEventListener('keydown', (e) => {
         if (enemies[i].text[0] && enemies[i].text[0].toLowerCase() === key) {
             enemies[i].text = enemies[i].text.slice(1);
 
+            typingSound.currentTime = 0;
+            typingSound.play();
+
             if (enemies[i].text === "") {
-                if (enemies[i].isBoss) {
-                    isBossActive = false;
-                    score += 100;
-                } else {
-                    score += 10;
-                }
                 enemies.splice(i, 1);
+                score += 10;
                 scoreElement.innerText = score;
+                dieSound.currentTime = 0;
+                dieSound.play();
             }
             break;
         }
@@ -117,11 +94,7 @@ function gameLoop(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 
-    if (!isBossActive && score >= nextBossScore) {
-        spawnBoss();
-        isBossActive = true;
-        nextBossScore += 1000;
-    } else if (!isBossActive && timestamp - lastSpawnTime > spawnRate) {
+    if (timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
         lastSpawnTime = timestamp;
 
