@@ -1,108 +1,149 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const scoreElement = document.getElementById('score');
-const finalScoreElement = document.getElementById('final-score');
-const gameOverScreen = document.getElementById('game-over');
-
-
-canvas.width = 800;
-canvas.height = 600;
-
-
+//  BASIC GAME STATE
 let score = 0;
-let isGameOver = false;
-let spawnRate = 2000; 
-let lastSpawnTime = 0;
-
-
-const wordList = [
-    "code", "bug", "fix", "git", "push", "pull", "merge", 
-    "java", "node", "html", "css", "react", "vue", "data",
-    "loop", "if", "else", "var", "let", "const", "array"
-];
-
-
 let enemies = [];
+let boss = null;
+let isBossFight = false;
 
-class Enemy {
-    constructor(x, y, text) {
-        this.x = x;
-        this.y = y;
-        this.text = text;
-        this.speed = 1 + Math.random(); 
-        this.color = '#0f0';
-    }
+const gameArea = document.getElementById("gameArea");
+const scoreDisplay = document.getElementById("score");
 
-    draw() {
-        ctx.font = '20px Courier New';
-        ctx.fillStyle = this.color;
-        ctx.fillText(this.text, this.x, this.y);
-    }
+const bossContainer = document.getElementById("bossContainer");
+const bossHealthBar = document.getElementById("bossHealth");
 
-    update() {
-        this.y += this.speed;
-    }
-}
-
+//  NORMAL ENEMY 
 function spawnEnemy() {
-    const text = wordList[Math.floor(Math.random() * wordList.length)];
-    const x = Math.random() * (canvas.width - 100) + 50;
-    const y = -20; 
-    enemies.push(new Enemy(x, y, text));
+    if (isBossFight) return;
+
+    const word = getRandomWord();
+    const enemy = {
+        text: word,
+        x: Math.random() * (gameArea.clientWidth - 100),
+        y: 0,
+        speed: 2
+    };
+
+    enemies.push(enemy);
 }
 
-function gameOver() {
-    isGameOver = true;
-    finalScoreElement.innerText = score;
-    gameOverScreen.classList.remove('hidden');
+//  BOSS LOGIC 
+function spawnBoss() {
+    isBossFight = true;
+    enemies = [];
+
+    boss = {
+        text: "Supercalifragilisticexpialidocious",
+        x: gameArea.clientWidth / 2 - 120,
+        y: 0,
+        speed: 0.6,
+        health: 100,
+        maxHealth: 100
+    };
+
+    bossContainer.style.display = "block";
+    updateBossHealth();
 }
 
+function updateBossHealth() {
+    const percent = (boss.health / boss.maxHealth) * 100;
+    bossHealthBar.style.width = percent + "%";
+}
 
-window.addEventListener('keydown', (e) => {
-    if (isGameOver) return;
+//  GAME UPDATE 
+function updateGame() {
+    // Move normal enemies
+    enemies.forEach(enemy => {
+        enemy.y += enemy.speed;
+    });
 
-    const key = e.key.toLowerCase();
-
-    for (let i = 0; i < enemies.length; i++) {
-        if (enemies[i].text[0] && enemies[i].text[0].toLowerCase() === key) {
-            enemies[i].text = enemies[i].text.slice(1);
-
-            if (enemies[i].text === "") {
-                enemies.splice(i, 1);
-                score += 10;
-                scoreElement.innerText = score;
-            }
-            break;
-        }
+    // Move boss
+    if (boss) {
+        boss.y += boss.speed;
     }
+
+    checkBossTrigger();
+}
+
+//  SCORE CHECK 
+function checkBossTrigger() {
+    if (score > 0 && score % 1000 === 0 && !isBossFight) {
+        spawnBoss();
+    }
+}
+
+// TYPING INPUT
+document.addEventListener("keydown", e => {
+    const key = e.key;
+
+    // Boss typing
+    if (boss) {
+        if (boss.text.startsWith(key)) {
+            boss.text = boss.text.slice(1);
+            boss.health -= 5;
+            updateBossHealth();
+
+            if (boss.health <= 0) {
+                boss = null;
+                isBossFight = false;
+                bossContainer.style.display = "none";
+                score += 100;
+            }
+        }
+        return;
+    }
+
+    // Normal enemies typing
+    enemies.forEach((enemy, index) => {
+        if (enemy.text.startsWith(key)) {
+            enemy.text = enemy.text.slice(1);
+
+            if (enemy.text.length === 0) {
+                enemies.splice(index, 1);
+                score += 100;
+            }
+        }
+    });
+
+    scoreDisplay.innerText = score;
 });
 
-function gameLoop(timestamp) {
-    if (isGameOver) return;
+//  DRAW function added 
+function draw() {
+    gameArea.innerHTML = "";
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    enemies.forEach(enemy => {
+        const el = document.createElement("div");
+        el.innerText = enemy.text;
+        el.style.position = "absolute";
+        el.style.left = enemy.x + "px";
+        el.style.top = enemy.y + "px";
+        gameArea.appendChild(el);
+    });
 
-
-    if (timestamp - lastSpawnTime > spawnRate) {
-        spawnEnemy();
-        lastSpawnTime = timestamp;
-
-        if (spawnRate > 500) spawnRate -= 10;
+    if (boss) {
+        const bossEl = document.createElement("div");
+        bossEl.innerText = boss.text;
+        bossEl.style.position = "absolute";
+        bossEl.style.left = boss.x + "px";
+        bossEl.style.top = boss.y + "px";
+        bossEl.style.fontSize = "22px";
+        bossEl.style.fontWeight = "bold";
+        gameArea.appendChild(bossEl);
     }
-
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        let enemy = enemies[i];
-        enemy.update();
-        enemy.draw();
-
-        if (enemy.y > canvas.height) {
-            gameOver();
-        }
-    }
-
-    requestAnimationFrame(gameLoop);
 }
 
+//HELPERS i added 
+function getRandomWord() {
+    const words = ["code", "game", "fast", "logic", "type", "play"];
+    return words[Math.floor(Math.random() * words.length)];
+}
 
-requestAnimationFrame(gameLoop);
+// GAME LOOP I ADDED
+setInterval(() => {
+    spawnEnemy();
+}, 1200);
+
+setInterval(() => {
+    updateGame();
+    draw();
+    scoreDisplay.innerText = score;
+}, 30);

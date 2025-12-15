@@ -1,23 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WordBlast - PatchFest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Word Blast</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            background: white;
+            border: 2px solid #333;
+            overflow: hidden;
+        }
+
+        #scoreBoard {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        #bossContainer {
+            display: none;
+            width: 300px;
+            border: 2px solid #000;
+            margin: 10px auto;
+        }
+
+        #bossHealth {
+            height: 20px;
+            width: 100%;
+            background: red;
+        }
+    </style>
 </head>
+
 <body>
-    <div id="game-container">
-        <div id="ui-layer">
-            <div id="score-board">Score: <span id="score">0</span></div>
-            <div id="game-over" class="hidden">
-                <h1>GAME OVER</h1>
-                <p>Final Score: <span id="final-score">0</span></p>
-                <button onclick="location.reload()">Restart</button>
-            </div>
-        </div>
-        <canvas id="gameCanvas"></canvas>
+
+    <h1>Word Blast</h1>
+
+    <div id="scoreBoard">
+        Score: <span id="score">0</span>
     </div>
+
+    <div id="bossContainer"> //added
+        <div id="bossHealth"></div> //added
+    </div>
+
+    <div id="gameArea"></div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
