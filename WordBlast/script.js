@@ -29,7 +29,6 @@ const NEON_COLORS = [
     "#00ffff", 
     "#ff00ff", 
     "#ffff00", 
-    "#00ff00", 
     "#ff6600", 
     "#00ffcc"  
 ];
