@@ -13,6 +13,8 @@ let score = 0;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
+let startTime = Date.now();
+let wordsDestroyed = 0;
 
 
 const wordList = [
@@ -54,6 +56,11 @@ function spawnEnemy() {
 function gameOver() {
     isGameOver = true;
     finalScoreElement.innerText = score;
+    const elapsedMinutes = (Date.now() - startTime) / 60000;
+    const wpm = elapsedMinutes > 0 ? wordsDestroyed / elapsedMinutes : 0;
+    const wpmElement = document.createElement('p');
+    wpmElement.innerText = `WPM: ${wpm.toFixed(2)}`;
+    gameOverScreen.appendChild(wpmElement);
     gameOverScreen.classList.remove('hidden');
 }
 
@@ -70,6 +77,7 @@ window.addEventListener('keydown', (e) => {
             if (enemies[i].text === "") {
                 enemies.splice(i, 1);
                 score += 10;
+                wordsDestroyed++;
                 scoreElement.innerText = score;
             }
             break;
