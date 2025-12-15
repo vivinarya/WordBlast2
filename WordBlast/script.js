@@ -24,13 +24,26 @@ const wordList = [
 
 let enemies = [];
 
+//Adding array of neon colours
+const NEON_COLORS = [
+    "#00ffff", 
+    "#ff00ff", 
+    "#ffff00", 
+    "#00ff00", 
+    "#ff6600", 
+    "#00ffcc"  
+];
+
 class Enemy {
     constructor(x, y, text) {
         this.x = x;
         this.y = y;
         this.text = text;
         this.speed = 1 + Math.random(); 
-        this.color = '#0f0';
+        //selecting randomly from array of neon colours
+        this.color = NEON_COLORS[
+            Math.floor(Math.random() * NEON_COLORS.length)
+        ];
     }
 
     draw() {
