@@ -13,6 +13,7 @@ let isGameOver = false;
 let spawnRate = 2000;
 let lastSpawnTime = 0;
 
+//Added more words to have a bigger dataset
 const wordList = [
     "code", "bug", "fix", "git", "push", "pull", "merge",
     "java", "node", "html", "css", "react", "vue", "data",
