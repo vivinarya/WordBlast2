@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
+const livesElement = document.getElementById('lives');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
 
@@ -10,6 +11,8 @@ canvas.height = 600;
 
 
 let score = 0;
+let lives = 3;
+const maxLives = 3;
 let isGameOver = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
@@ -57,6 +60,14 @@ function gameOver() {
     gameOverScreen.classList.remove('hidden');
 }
 
+function updateLivesDisplay() {
+    if (!livesElement) return;
+    const fullHeart = '❤';
+    const emptyHeart = '♡';
+    const hearts = fullHeart.repeat(lives) + emptyHeart.repeat(maxLives - lives);
+    livesElement.innerText = hearts;
+}
+
 
 window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
@@ -97,7 +108,13 @@ function gameLoop(timestamp) {
         enemy.draw();
 
         if (enemy.y > canvas.height) {
-            gameOver();
+            // Enemy escaped: lose a life instead of instant game over
+            enemies.splice(i, 1);
+            lives = Math.max(0, lives - 1);
+            updateLivesDisplay();
+            if (lives <= 0) {
+                gameOver();
+            }
         }
     }
 
@@ -105,4 +122,5 @@ function gameLoop(timestamp) {
 }
 
 
+updateLivesDisplay();
 requestAnimationFrame(gameLoop);

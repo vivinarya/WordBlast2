@@ -35,9 +35,32 @@ canvas {
     position: absolute;
     top: 10px;
     left: 10px;
-    font-size: 24px;
+    display: flex;
+    gap: 12px;
+    font-size: 20px;
     font-weight: bold;
-    text-shadow: 0 0 5px #0f0;
+}
+
+.score-box, .lives-box {
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid #0f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.25);
+    color: #0f0;
+    text-shadow: 0 0 6px #0f0;
+}
+
+.lives-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.heart {
+    color: #ff4d4f;
+    font-size: 20px;
+    text-shadow: 0 0 6px #ff4d4f;
 }
 
 #game-over {
