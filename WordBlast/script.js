@@ -34,7 +34,7 @@ class Enemy {
     }
 
     draw() {
-        ctx.font = '26px Courier New';
+        ctx.font = '20px Courier New';
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.x, this.y);
     }
