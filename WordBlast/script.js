@@ -18,6 +18,8 @@ let lastSpawnTime = 0;
 let levelUpAlpha = 0;
 let lockedEnemy = null;
 
+const MIN_X_DISTANCE = 80;
+
 const wordList = [
     "code", "bug", "fix", "git", "push", "pull", "merge",
     "java", "node", "html", "css", "react", "vue", "data",
@@ -46,9 +48,20 @@ class Enemy {
     }
 }
 
+function isTooClose(x) {
+    return enemies.some(enemy => Math.abs(enemy.x - x) < MIN_X_DISTANCE);
+}
+
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
-    const x = Math.random() * (canvas.width - 100) + 50;
+    let x;
+    let attempts = 0;
+
+    do {
+        x = Math.random() * (canvas.width - 100) + 50;
+        attempts++;
+    } while (isTooClose(x) && attempts < 10);
+
     const speed = 1 + level * 0.8;
     enemies.push(new Enemy(x, -20, text, speed));
 }
