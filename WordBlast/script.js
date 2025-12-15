@@ -3,24 +3,24 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
-
+const restartBtn = document.getElementById('restart-btn');
 
 canvas.width = 800;
 canvas.height = 600;
 
-
 let score = 0;
 let isGameOver = false;
-let spawnRate = 2000; 
+let spawnRate = 2000;
 let lastSpawnTime = 0;
 
-
 const wordList = [
-    "code", "bug", "fix", "git", "push", "pull", "merge", 
+    "code", "bug", "fix", "git", "push", "pull", "merge",
     "java", "node", "html", "css", "react", "vue", "data",
-    "loop", "if", "else", "var", "let", "const", "array"
+    "loop", "if", "else", "var", "let", "const", "array",
+    "script", "async", "await", "server", "client", "stack",
+    "queue", "binary", "logic", "patch", "deploy", "cache",
+    "cloud", "docker", "linux", "debug", "compile", "query"
 ];
-
 
 let enemies = [];
 
@@ -29,13 +29,19 @@ class Enemy {
         this.x = x;
         this.y = y;
         this.text = text;
-        this.speed = 1 + Math.random(); 
-        this.color = '#0f0';
+        this.speed = 1 + Math.random();
+    }
+
+    getColor() {
+        const progress = this.y / canvas.height;
+        if (progress < 0.5) return '#0f0';
+        if (progress < 0.8) return '#ff0';
+        return '#f00';
     }
 
     draw() {
-        ctx.font = '20px Courier New';
-        ctx.fillStyle = this.color;
+        ctx.font = '28px Courier New';
+        ctx.fillStyle = this.getColor();
         ctx.fillText(this.text, this.x, this.y);
     }
 
@@ -47,7 +53,7 @@ class Enemy {
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
-    const y = -20; 
+    const y = -20;
     enemies.push(new Enemy(x, y, text));
 }
 
@@ -56,7 +62,6 @@ function gameOver() {
     finalScoreElement.innerText = score;
     gameOverScreen.classList.remove('hidden');
 }
-
 
 window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
@@ -82,14 +87,12 @@ function gameLoop(timestamp) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
     if (timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
         lastSpawnTime = timestamp;
 
         if (spawnRate > 500) spawnRate -= 10;
     }
-
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         let enemy = enemies[i];
@@ -104,5 +107,8 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
+restartBtn.addEventListener('click', () => {
+    location.reload();
+});
 
 requestAnimationFrame(gameLoop);

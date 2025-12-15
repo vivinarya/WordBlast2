@@ -3,22 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WordBlast - PatchFest</title>
+    <title>WordBlast - PatchFest Edition</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
         <div id="ui-layer">
-            <div id="score-board">Score: <span id="score">0</span></div>
+            <div id="top-bar">
+                <div id="game-title">WordBlast: PatchFest Edition</div>
+                <div id="score-board">Score: <span id="score">0</span></div>
+            </div>
+
             <div id="game-over" class="hidden">
                 <h1>GAME OVER</h1>
                 <p>Final Score: <span id="final-score">0</span></p>
-                <button onclick="location.reload()">Restart</button>
+                <button id="restart-btn">Play Again</button>
+            </div>
+
+            <div id="instructions">
+                <h2>How to Play</h2>
+                <p>Type the letters of each falling word before it hits the bottom.</p>
             </div>
         </div>
+
         <canvas id="gameCanvas"></canvas>
     </div>
+
+    <div id="footer">
+        <p>Made with ❤ for PatchFest by vivinarya</p>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
