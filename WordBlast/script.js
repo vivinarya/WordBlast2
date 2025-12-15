@@ -36,6 +36,7 @@ const wordList = [
 
 
 let enemies = [];
+let particle=[];
 
 class Enemy {
     constructor(x, y, text) {
@@ -56,12 +57,48 @@ class Enemy {
         this.y += this.speed;
     }
 }
+class Particle{
+    constructor(x,y){
+        this.x=x;
+        this.y=y;
+        this.radius=Math.random()*3+2;
+        this.speedx=(Math.random()-0.5)*6;
+        this.speedy=(Math.random()-0.5)*6;
+        this.alpha=1;
+        this.friction=0.98;
+        this.fade=0.03;
+    }
+
+    update(){
+        this.speedx*=this.friction;
+        this.speedy*=this.friction;
+        this.x+=this.speedx;
+        this.y+=this.speedy;
+        this.alpha-=this.fade;
+    }
+
+    draw(){
+        ctx.save();
+        ctx.globalAlpha=this.alpha;
+        ctx.fillStyle="#00ff88";
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
 
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
     const y = -20; 
     enemies.push(new Enemy(x, y, text));
+}
+
+function spawnparticles(x,y){
+    for (let i=0;i<20;i++){
+        particle.push(new Particle(x,y));
+    }
 }
 
 function gameOver() {
@@ -81,6 +118,7 @@ window.addEventListener('keydown', (e) => {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
+                spawnparticles(enemies[i].x,enemies[i].y);
                 enemies.splice(i, 1);
                 score += 10;
                 scoreElement.innerText = score;
@@ -111,6 +149,15 @@ function gameLoop(timestamp) {
 
         if (enemy.y > canvas.height) {
             gameOver();
+        }
+    }
+
+    for (let i=particle.length-1;i>=0;i--){
+        let p=particle[i];
+        p.update();
+        p.draw();
+        if (p.alpha<=0){
+            particle.splice(i,1);
         }
     }
 
