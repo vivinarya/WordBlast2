@@ -70,3 +70,40 @@ button {
 button:hover {
     background: #fff;
 }
+/*Adding footer with credits*/
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#game-wrapper {
+    width: 800px;           
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#game-footer {
+    position: absolute;
+    bottom: -32px;          
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+
+    font-size: 14px;
+    color: #0f0;
+    opacity: 0.8;
+}
+
+#game-footer a {
+    color: #0f0;
+    text-decoration: none;
+    border-bottom: 1px dotted #0f0;
+}
+
+#game-footer a:hover {
+    border-bottom-style: solid;
+    opacity: 1;
+}
