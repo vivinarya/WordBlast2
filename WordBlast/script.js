@@ -53,6 +53,7 @@ class Enemy {
     }
 }
 
+//this is a comment
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
