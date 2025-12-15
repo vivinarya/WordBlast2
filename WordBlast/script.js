@@ -11,6 +11,8 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+let startTime = null;
+let wordsDestroyed = 0; 
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -53,9 +55,22 @@ function spawnEnemy() {
 
 function gameOver() {
     isGameOver = true;
+
+    const elapsedMinutes = (performance.now() - startTime) / 60000;
+    const wpm = elapsedMinutes > 0
+        ? Math.round(wordsDestroyed / elapsedMinutes)
+        : 0;
+
     finalScoreElement.innerText = score;
+
+    // Append WPM display
+    const wpmElement = document.createElement("p");
+    wpmElement.innerText = `Typing Speed: ${wpm} WPM`;
+    gameOverScreen.appendChild(wpmElement);
+
     gameOverScreen.classList.remove('hidden');
 }
+
 
 
 window.addEventListener('keydown', (e) => {
@@ -70,15 +85,22 @@ window.addEventListener('keydown', (e) => {
             if (enemies[i].text === "") {
                 enemies.splice(i, 1);
                 score += 10;
+                wordsDestroyed++;
                 scoreElement.innerText = score;
             }
+
             break;
         }
     }
 });
 
 function gameLoop(timestamp) {
+    
     if (isGameOver) return;
+    if (!startTime) {
+        startTime = timestamp;
+    }
+
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
