@@ -11,14 +11,25 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
-let spawnRate = 2000; 
+let spawnRate = 2000;
 let lastSpawnTime = 0;
 
 
 const wordList = [
-    "code", "bug", "fix", "git", "push", "pull", "merge", 
+    "code", "bug", "fix", "git", "push", "pull", "merge",
     "java", "node", "html", "css", "react", "vue", "data",
-    "loop", "if", "else", "var", "let", "const", "array"
+    "loop", "if", "else", "var", "let", "const", "array",
+    // 50 news words
+    "file", "program", "python", "logic", "c", "c++",
+    "kotlin", "swift", "rust", "vim", "linux", "distro",
+    "ubuntu", "bash", "zsh", "shell", "scala", "sql",
+    "assembly", "javascript", "typescript", "devops",
+    "container", "docker", "json", "yaml", "readme",
+    "windows", "macos", "opensource", "foss", "hack",
+    "testing", "frontend", "backend", "angular", "vanilla",
+    "next", "hadoop", "php", "oracle", "ibm", "apple",
+    "aws", "azure", "apache", "api", "cloud",
+    "deploy"
 ];
 
 
@@ -29,7 +40,7 @@ class Enemy {
         this.x = x;
         this.y = y;
         this.text = text;
-        this.speed = 1 + Math.random(); 
+        this.speed = 1 + Math.random();
         this.color = '#0f0';
     }
 
@@ -47,7 +58,7 @@ class Enemy {
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
     const x = Math.random() * (canvas.width - 100) + 50;
-    const y = -20; 
+    const y = -20;
     enemies.push(new Enemy(x, y, text));
 }
 
