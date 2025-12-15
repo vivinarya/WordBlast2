@@ -1,5 +1,7 @@
+let highScore = localStorage.getItem("wordblastHighScore") ? parseInt(localStorage.getItem("wordblastHighScore")): 0; //added to get high score from local storage
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const scoreBoard = document.getElementById('score-board'); //to display scoreboard
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
@@ -53,6 +55,12 @@ function spawnEnemy() {
 
 function gameOver() {
     isGameOver = true;
+    //displaying updated scoreboard
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("wordblastHighScore", highScore);
+    }
+    updateScoreBoard();
     finalScoreElement.innerText = score;
     gameOverScreen.classList.remove('hidden');
 }
@@ -104,5 +112,9 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
+//helper function to update scoreboard
+function updateScoreBoard() {
+    scoreBoard.innerHTML = `Score: <span id="score">${score}</span> | High: ${highScore}`;
+}
 
 requestAnimationFrame(gameLoop);
