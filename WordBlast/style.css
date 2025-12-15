@@ -70,3 +70,22 @@ button {
 button:hover {
     background: #fff;
 }
+
+.site-header {
+    text-align: center;
+    padding: 8px 12px;
+    color: #0f0;
+    text-shadow: 0 0 6px rgba(0,255,0,0.8);
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: 1px;
+}
+
+.site-header .subtitle {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    opacity: 0.85;
+}
