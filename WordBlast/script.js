@@ -25,6 +25,8 @@ const wordList = [
 
 let enemies = [];
 
+//Defined Enemy class to encapsulate enemy properties and methods
+//Added colors to increase warning as word nears bottom
 class Enemy {
     constructor(x, y, text) {
         this.x = x;
