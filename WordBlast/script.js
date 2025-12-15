@@ -32,6 +32,8 @@ const wordList = [
     "deploy"
 ];
 
+// list of colors
+const colorslist = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#800080"];
 
 let enemies = [];
 
@@ -41,7 +43,8 @@ class Enemy {
         this.y = y;
         this.text = text;
         this.speed = 1 + Math.random();
-        this.color = '#0f0';
+        // random color selection 
+        this.color = colorslist[Math.floor(Math.random() * 5)];
     }
 
     draw() {
