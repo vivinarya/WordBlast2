@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const mobileInput = document.getElementById('mobileInput');
 
 canvas.width = 800;
 canvas.height = 600;
@@ -19,7 +20,6 @@ const wordList = [
 ];
 
 let enemies = [];
-let particles = [];
 
 /* --------------------
    Enemy Class
@@ -45,39 +45,6 @@ class Enemy {
 }
 
 /* --------------------
-   Particle Class
--------------------- */
-class Particle {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.radius = 2;
-        this.alpha = 1;
-        this.velocityX = (Math.random() - 0.5) * 6;
-        this.velocityY = (Math.random() - 0.5) * 6;
-        this.friction = 0.95;
-    }
-
-    update() {
-        this.velocityX *= this.friction;
-        this.velocityY *= this.friction;
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-        this.alpha -= 0.02;
-    }
-
-    draw() {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = '#0f0';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    }
-}
-
-/* --------------------
    Helpers
 -------------------- */
 function spawnEnemy() {
@@ -87,12 +54,6 @@ function spawnEnemy() {
     enemies.push(new Enemy(x, y, text));
 }
 
-function spawnParticles(x, y) {
-    for (let i = 0; i < 20; i++) {
-        particles.push(new Particle(x, y));
-    }
-}
-
 function gameOver() {
     isGameOver = true;
     finalScoreElement.innerText = score;
@@ -100,25 +61,46 @@ function gameOver() {
 }
 
 /* --------------------
-   Input
+   Unified Input Handler
 -------------------- */
-window.addEventListener('keydown', (e) => {
+function handleInput(key) {
     if (isGameOver) return;
 
-    const key = e.key.toLowerCase();
+    key = key.toLowerCase();
 
     for (let i = 0; i < enemies.length; i++) {
         if (enemies[i].text[0]?.toLowerCase() === key) {
             enemies[i].text = enemies[i].text.slice(1);
 
             if (enemies[i].text === "") {
-                spawnParticles(enemies[i].x, enemies[i].y);
                 enemies.splice(i, 1);
                 score += 10;
                 scoreElement.innerText = score;
             }
             break;
         }
+    }
+}
+
+/* --------------------
+   Desktop Keyboard
+-------------------- */
+window.addEventListener('keydown', (e) => {
+    handleInput(e.key);
+});
+
+/* --------------------
+   Mobile Keyboard Support
+-------------------- */
+canvas.addEventListener('touchstart', () => {
+    mobileInput.focus();
+});
+
+mobileInput.addEventListener('input', () => {
+    const value = mobileInput.value;
+    if (value.length > 0) {
+        handleInput(value[value.length - 1]);
+        mobileInput.value = "";
     }
 });
 
@@ -143,16 +125,6 @@ function gameLoop(timestamp) {
 
         if (enemy.y > canvas.height) {
             gameOver();
-        }
-    }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.update();
-        p.draw();
-
-        if (p.alpha <= 0) {
-            particles.splice(i, 1);
         }
     }
 
