@@ -9,6 +9,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    flex-direction: column; /*Added title at the top*/
 }
 
 #game-container {
