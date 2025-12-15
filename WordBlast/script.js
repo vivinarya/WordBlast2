@@ -18,7 +18,18 @@ let lastSpawnTime = 0;
 const wordList = [
     "code", "bug", "fix", "git", "push", "pull", "merge", 
     "java", "node", "html", "css", "react", "vue", "data",
-    "loop", "if", "else", "var", "let", "const", "array"
+    "loop", "if", "else", "var", "let", "const", "array",
+    "python", "docker", "kubernetes", "algorithm", "compile",
+    "debug", "syntax", "object", "class", "method", "function",
+    "variable", "string", "integer", "boolean", "float",
+    "double", "char", "list", "map", "set", "stack", "queue",
+    "heap", "tree", "graph", "database", "sql", "nosql",
+    "mongo", "redis", "aws", "azure", "cloud", "server",
+    "client", "api", "rest", "json", "xml", "yaml", "linux",
+    "bash", "shell", "terminal", "script", "build", "deploy",
+    "test", "unit", "integration", "agile", "scrum", "kanban",
+    "jira", "sprint", "backlog", "interface", "design",
+    "pattern", "solid", "dry", "kiss", "yagni"
 ];
 
 
