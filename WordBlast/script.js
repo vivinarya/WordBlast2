@@ -11,6 +11,7 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+const minSpawnGap = 120; // minimum horizontal gap between spawned enemies
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -46,8 +47,18 @@ class Enemy {
 
 function spawnEnemy() {
     const text = wordList[Math.floor(Math.random() * wordList.length)];
-    const x = Math.random() * (canvas.width - 100) + 50;
     const y = -20; 
+
+    // Try multiple times to find an x that is not too close to existing enemies
+    let x = Math.random() * (canvas.width - 100) + 50;
+    let attempts = 0;
+    while (attempts < 10) {
+        const tooClose = enemies.some(e => Math.abs(e.x - x) < minSpawnGap);
+        if (!tooClose) break;
+        x = Math.random() * (canvas.width - 100) + 50;
+        attempts++;
+    }
+
     enemies.push(new Enemy(x, y, text));
 }
 
