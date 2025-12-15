@@ -8,6 +8,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 100vh;
 }
 
@@ -69,4 +70,13 @@ button {
 
 button:hover {
     background: #fff;
+}
+
+.game-header {
+    font-family: 'Orbitron', sans-serif;
+    color: #0f0;
+    text-align: center;
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px #000;
+    margin: 20px 0;
 }
