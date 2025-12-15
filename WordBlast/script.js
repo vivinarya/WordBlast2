@@ -21,6 +21,7 @@ const wordList = [
     "loop", "if", "else", "var", "let", "const", "array"
 ];
 
+const neonColors = ['#0ff', '#f0f', '#ff0', '#0f0', '#f80', '#0f8', '#f08'];
 
 let enemies = [];
 
@@ -30,7 +31,7 @@ class Enemy {
         this.y = y;
         this.text = text;
         this.speed = 1 + Math.random(); 
-        this.color = '#0f0';
+        this.color = neonColors[Math.floor(Math.random() * neonColors.length)];
     }
 
     draw() {
