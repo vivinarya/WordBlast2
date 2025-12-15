@@ -70,3 +70,20 @@ button {
 button:hover {
     background: #fff;
 }
+#game-title {
+    font-size: 48px;
+    letter-spacing: 4px;
+    margin-bottom: 5px;
+    color: #0f0;
+    text-shadow: 
+        0 0 5px #0f0,
+        0 0 15px #0f0,
+        0 0 30px #00ff99;
+}
+
+#game-tagline {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #8aff8a;
+    text-shadow: 0 0 5px #0f0;
+}
