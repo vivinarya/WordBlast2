@@ -130,3 +130,18 @@ button:hover {
     text-shadow: 0 0 3px #0f0;
     z-index: 9999;
 }
+
+#type-feedback {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 50px;
+    color: #0f0;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    font-family: 'Courier New', monospace;
+    z-index: 9999;
+    pointer-events: none;
+    
+}
