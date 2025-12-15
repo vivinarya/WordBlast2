@@ -10,6 +10,9 @@ body {
     align-items: center;
     height: 100vh;
 }
+#start-menu {
+    pointer-events: auto;
+}
 
 #game-container {
     position: relative;
