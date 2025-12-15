@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
+const startMenu = document.getElementById("start-menu"); //displays start menu
+const playButton = document.getElementById("play-button"); //displays play button
 
 
 canvas.width = 800;
@@ -11,6 +13,7 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+let gameStarted = false; //variable to check for game starting
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -59,18 +62,18 @@ function gameOver() {
 
 
 window.addEventListener('keydown', (e) => {
-    if (isGameOver) return;
-
+    console.log("KEY:", e.key, "STATE:", gameStarted, isGameOver); //just for checking console
+    if (!gameStarted || isGameOver) return;
     const key = e.key.toLowerCase();
-
     for (let i = 0; i < enemies.length; i++) {
-        if (enemies[i].text[0] && enemies[i].text[0].toLowerCase() === key) {
+        if (!enemies[i].text) continue;
+        if (enemies[i].text[0].toLowerCase() === key) {
             enemies[i].text = enemies[i].text.slice(1);
 
-            if (enemies[i].text === "") {
+            if (enemies[i].text.length === 0) {
                 enemies.splice(i, 1);
                 score += 10;
-                scoreElement.innerText = score;
+                updateScoreBoard();
             }
             break;
         }
@@ -104,5 +107,13 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
+//play button workings
+playButton.addEventListener("click", () => {
+    startMenu.classList.add("hidden");
+    gameStarted = true;
 
-requestAnimationFrame(gameLoop);
+    spawnEnemy();                    
+    lastSpawnTime = performance.now();
+
+    requestAnimationFrame(gameLoop);
+});
