@@ -11,6 +11,7 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+let isPaused = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -59,7 +60,15 @@ function gameOver() {
 
 
 window.addEventListener('keydown', (e) => {
-    if (isGameOver) return;
+    if (isGameOver || isPaused) return;
+
+    if (e.key === 'Escape') {
+        isPaused = !isPaused;
+        if (!isPaused) {
+            requestAnimationFrame(gameLoop);
+        }
+        return;
+    }
 
     const key = e.key.toLowerCase();
 
@@ -79,6 +88,16 @@ window.addEventListener('keydown', (e) => {
 
 function gameLoop(timestamp) {
     if (isGameOver) return;
+
+    if (isPaused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '40px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('Paused', canvas.width / 2, canvas.height / 2);
+        ctx.textAlign = 'left';
+        return;
+    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
