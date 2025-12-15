@@ -16,10 +16,31 @@ let lastSpawnTime = 0;
 
 
 const wordList = [
-    "code", "bug", "fix", "git", "push", "pull", "merge", 
-    "java", "node", "html", "css", "react", "vue", "data",
-    "loop", "if", "else", "var", "let", "const", "array"
+    // Programming & Basics
+    "code", "bug", "fix", "logic", "syntax", "compile", "execute",
+    "array", "object", "function", "variable", "constant", "loop",
+    "ifelse", "return", "debug",
+
+    // Languages
+    "python", "javascript", "java", "csharp", "golang", "typescript",
+    "html", "css", "sql", "node", "react", "vue",
+
+    // Computer Science
+    "algorithm", "datastructure", "recursion", "binary", "hashmap",
+    "stack", "queue", "tree", "graph",
+
+    // Dev & Tools
+    "git", "github", "commit", "push", "pull", "merge", "branch",
+    "docker", "kubernetes", "container", "pipeline", "ci", "cd",
+
+    // Web & Systems
+    "backend", "frontend", "database", "server", "client", "api",
+    "request", "response", "middleware", "framework",
+
+    // Cyber / OS
+    "linux", "terminal", "kernel", "process", "thread", "encryption"
 ];
+
 
 
 let enemies = [];
