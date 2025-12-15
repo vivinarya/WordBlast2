@@ -11,6 +11,7 @@ canvas.height = 600;
 
 let score = 0;
 let isGameOver = false;
+let isPaused = false;
 let spawnRate = 2000; 
 let lastSpawnTime = 0;
 
@@ -61,6 +62,18 @@ function gameOver() {
 window.addEventListener('keydown', (e) => {
     if (isGameOver) return;
 
+    // Toggle pause on Escape
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        isPaused = !isPaused;
+        // Prevent an immediate spawn burst on resume
+        if (!isPaused) {
+            lastSpawnTime = performance.now();
+        }
+        return;
+    }
+
+    if (isPaused) return;
+
     const key = e.key.toLowerCase();
 
     for (let i = 0; i < enemies.length; i++) {
@@ -82,6 +95,22 @@ function gameLoop(timestamp) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Render enemies in place while paused, but skip updates/spawns
+    if (isPaused) {
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            enemies[i].draw();
+        }
+        // Overlay "Paused" text
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0f0';
+        ctx.font = '36px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+        ctx.textAlign = 'start';
+        requestAnimationFrame(gameLoop);
+        return;
+    }
 
     if (timestamp - lastSpawnTime > spawnRate) {
         spawnEnemy();
